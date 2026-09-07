@@ -1,0 +1,26 @@
+bin/
+*.exe
+.exe~
+*.dil
+*.so
+
+#Test binary,built with 'go test  -c'
+*.test
+
+.env
+go.work
+vendor/
+*.out
+
+#ide
+.vscode/
+.idea/
+*.swp
+*.swo
+
+.DS_Strore
+Thumps.db
+
+uploads/
+*.db
+*.sqlite
