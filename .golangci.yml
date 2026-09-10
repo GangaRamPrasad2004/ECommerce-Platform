@@ -1,0 +1,33 @@
+version: "2"
+
+run:
+  modules-download-mode: readonly
+
+linters:
+  enable:
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - misspell
+    - gocritic
+    - revive
+  settings:
+    errcheck:
+      check-type-assertions: true
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - experimental
+        - opinionated
+        - performance
+        - style
+    revive:
+      rules:
+        - name: exported
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
