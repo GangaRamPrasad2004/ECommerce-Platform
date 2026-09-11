@@ -1,7 +1,29 @@
 package main
 
-import "fmt"
+import (
+	"github.com/GangaRamPrasad2004/learning-go-shop/internal/config"
+	"github.com/GangaRamPrasad2004/learning-go-shop/internal/database"
+	"github.com/GangaRamPrasad2004/learning-go-shop/internal/logger"
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
-	fmt.Println("Hello, world")
+	log:=logger.New()
+	cfg,err:=config.Load()
+	if err!=nil{
+		log.Fatal().Err(err).Msg("failed to load config")
+	}
+
+	db,err:=database.New(&cfg.Database)
+	if err!=nil{
+		log.Fatal().Err(err).Msg("Failed to connect the database")
+	}
+	mainDB,err:=db.DB()
+	if err!=nil{
+		log.Fatal().Err(err).Msg("Failed to get database connecttion")
+	}
+	defer mainDB.Close()
+	gin.SetMode(cfg.Server.GinMode)
+	log.Info().Msg("starting the server")
+	
 }
