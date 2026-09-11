@@ -8,20 +8,22 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// Config contains the application's runtime configuration.
 type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
 	JWT      JWTConfig
 	AWS      AWSConfig
 	Upload   UploadConfig
-	
 }
 
+// ServerConfig contains HTTP server settings.
 type ServerConfig struct {
 	Port    string
 	GinMode string
 }
 
+// DatabaseConfig contains database connection settings.
 type DatabaseConfig struct {
 	Host     string
 	Port     string
@@ -31,11 +33,14 @@ type DatabaseConfig struct {
 	SSLMode  string
 }
 
+// JWTConfig contains JSON Web Token settings.
 type JWTConfig struct {
 	Secret              string
 	ExpiresIn           time.Duration
 	RefreshTokenExpires time.Duration
 }
+
+// AWSConfig contains AWS service credentials and settings.
 type AWSConfig struct {
 	Region          string
 	AccessKeyID     string
@@ -45,8 +50,7 @@ type AWSConfig struct {
 	EventQueueName  string
 }
 
-
-
+// UploadConfig contains file upload settings.
 type UploadConfig struct {
 	Path        string
 	MaxFileSize int64
@@ -55,13 +59,13 @@ type UploadConfig struct {
 	UploadProvider string
 }
 
+// Load reads the application's configuration from environment variables.
 func Load() (*Config, error) {
 	_ = godotenv.Load()
 
 	jwtExpiresIn, _ := time.ParseDuration(getEnv("JWT_EXPIRES_IN", "24h"))
 	refreshTokenExpires, _ := time.ParseDuration(getEnv("REFRESH_TOKEN_EXPIRES_IN", "720h"))
 	maxUploadSize, _ := strconv.ParseInt(getEnv("MAX_UPLOAD_SIZE", "10485760"), 10, 64)
-	
 
 	return &Config{
 		Server: ServerConfig{
@@ -94,7 +98,6 @@ func Load() (*Config, error) {
 			MaxFileSize:    maxUploadSize,
 			UploadProvider: getEnv("UPLOAD_PROVIDER", "local"),
 		},
-		
 	}, nil
 
 }
