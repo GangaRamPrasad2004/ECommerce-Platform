@@ -1,4 +1,4 @@
-.PHONY: help run build dev lint format migrate-up migrate-down docker-up docker-down
+.PHONY: help run build dev lint format migrate-create migrate-up migrate-down docker-up docker-down
 
 help:
 	@echo "Available commands:"
@@ -7,6 +7,7 @@ help:
 	@echo "  make dev            Run the application in development mode"
 	@echo "  make lint           Format and lint the code"
 	@echo "  make format         Format the code"
+	@echo "  make migrate-create name=<name>  Create a new SQL migration pair"
 	@echo "  make migrate-up     Apply database migrations"
 	@echo "  make migrate-down   Roll back database migrations"
 	@echo "  make docker-up      Start Docker services"
@@ -28,11 +29,14 @@ format:
 	gofmt -s -w .
 	
 
+migrate-create:
+	migrate create -ext sql -dir db/migrations -seq $(name)
+
 migrate-up:
-	migrate -path db/migrations -database "postgresql://postgres:password@localhost:5432/ecommerce_shop?sslmode=disable" up
+	migrate -path db/migrations -database "postgresql://postgres:Renuka@b0315@localhost:5432/ecommerce_shop?sslmode=disable" up
 
 migrate-down:
-	migrate -path db/migrations -database "postgresql://postgres:password@localhost:5432/ecommerce_shop?sslmode=disable" down
+	migrate -path db/migrations -database "postgresql://postgres:Renuka@b0315@localhost:5432/ecommerce_shop?sslmode=disable" down
 
 docker-up:
 	docker compose -f docker/docker-compose.yml up -d

@@ -3,9 +3,9 @@ package server
 import (
 	"strings"
 
-	"github.com/gin-gonic/gin"
 	"github.com/GangaRamPrasad2004/learning-go-shop/internal/models"
 	"github.com/GangaRamPrasad2004/learning-go-shop/internal/utils"
+	"github.com/gin-gonic/gin"
 )
 
 func (s *Server) authMiddleware() gin.HandlerFunc {

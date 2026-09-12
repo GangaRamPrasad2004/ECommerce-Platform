@@ -4,8 +4,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/GangaRamPrasad2004/learning-go-shop/internal/config"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 // Claims contains the data for the user
