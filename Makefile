@@ -1,4 +1,16 @@
-.PHONY: run build dev lint migrate-up migrate-down docker-up docker-down
+.PHONY: help run build dev lint format migrate-up migrate-down docker-up docker-down
+
+help:
+	@echo "Available commands:"
+	@echo "  make build          Build the application"
+	@echo "  make run            Run the application"
+	@echo "  make dev            Run the application in development mode"
+	@echo "  make lint           Format and lint the code"
+	@echo "  make format         Format the code"
+	@echo "  make migrate-up     Apply database migrations"
+	@echo "  make migrate-down   Roll back database migrations"
+	@echo "  make docker-up      Start Docker services"
+	@echo "  make docker-down    Stop Docker services"
 
 build:
 	go build -o bin/app ./cmd/api
@@ -9,8 +21,12 @@ run:
 dev:
 	go run ./cmd/api
 
-lint:
+lint:format
 	golangci-lint run ./...
+
+format:
+	gofmt -s -w .
+	
 
 migrate-up:
 	migrate -path db/migrations -database "postgresql://postgres:password@localhost:5432/ecommerce_shop?sslmode=disable" up
