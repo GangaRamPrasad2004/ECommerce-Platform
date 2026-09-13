@@ -108,7 +108,7 @@ func (s *AuthService) generatedAuthResponse(user *models.User) (*dto.AuthRespons
 		Token:     refreshToken,
 		ExpiresAt: time.Now().Add(s.config.JWT.RefreshTokenExpires),
 	}
-	s.db.Create(refreshTokenModel)
+	s.db.Create(&refreshTokenModel)
 	return &dto.AuthResponse{
 		User: dto.UserResponse{
 			ID:        user.ID,
