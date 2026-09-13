@@ -34,7 +34,13 @@ func (s *Server) SetupRoutes() *gin.Engine {
 	router.Use(s.corsMiddleware())
 
 	// add routes
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Server is running",
+		})
+	})
 	router.GET("/health", s.healthCheck)
+
 	api := router.Group("/api/v1")
 	{
 		auth := api.Group("/auth")
