@@ -7,35 +7,35 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (s *Server) Register(c *gin.Context){
+func (s *Server) register(c *gin.Context) {
 	var req dto.RegisterRequest
-	if err:=c.ShouldBindJSON(&req);err!=nil{
-		utils.BadRequestResponse(c,"Invalid Request Data",err)
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.BadRequestResponse(c, "Invalid Request Data", err)
 		return
 	}
-	authService:=service.NewAuthService(s.db,s.config)
-	response ,err:=authService.Register(&req)
-	if err!=nil{
-		utils.BadRequestResponse(c,"registration failed ",err)
+	authService := service.NewAuthService(s.db, s.config)
+	response, err := authService.Register(&req)
+	if err != nil {
+		utils.BadRequestResponse(c, "registration failed ", err)
 		return
 	}
-	utils.CreatedResponse(c,"user Registratered Sucessfully",response)
+	utils.CreatedResponse(c, "user Registratered Successfully", response)
 
 }
 
-func (s *Server)login (c *gin.Context){
+func (s *Server) login(c *gin.Context) {
 	var req dto.LoginRequest
-	if err:=c.ShouldBindJSON(&req);err!=nil{
-		utils.BadRequestResponse(c,"Invalid Request Data",err)
-        return
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.BadRequestResponse(c, "Invalid Request Data", err)
+		return
 	}
-	authService:=service.NewAuthService(s.db,s.config)
-	response,err:=authService.Login(&req)
-	if err!=nil{
-	   utils.UnauthorizedResponse(c,"Loin failed")
-	   return
+	authService := service.NewAuthService(s.db, s.config)
+	response, err := authService.Login(&req)
+	if err != nil {
+		utils.UnauthorizedResponse(c, "Loin failed")
+		return
 	}
-	utils.SuccessResponse(c,"Login Sucessful",response)
+	utils.SuccessResponse(c, "Login Successful", response)
 }
 
 func (s *Server) refreshToken(c *gin.Context) {
@@ -44,7 +44,7 @@ func (s *Server) refreshToken(c *gin.Context) {
 		utils.BadRequestResponse(c, "Invalid request data", err)
 		return
 	}
-authService:=service.NewAuthService(s.db,s.config)
+	authService := service.NewAuthService(s.db, s.config)
 	response, err := authService.RefreshToken(&req)
 	if err != nil {
 		utils.UnauthorizedResponse(c, "Token refresh failed")
@@ -60,8 +60,8 @@ func (s *Server) logout(c *gin.Context) {
 		utils.BadRequestResponse(c, "Invalid request data", err)
 		return
 	}
-authService:=service.NewAuthService(s.db,s.config)
-	if err :=authService.Logout(req.RefreshToken); err != nil {
+	authService := service.NewAuthService(s.db, s.config)
+	if err := authService.Logout(req.RefreshToken); err != nil {
 		utils.InternalServerErrorResponse(c, "Logout failed", err)
 		return
 	}
