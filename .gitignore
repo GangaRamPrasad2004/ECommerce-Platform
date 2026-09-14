@@ -1,8 +1,9 @@
 bin/
 *.exe
 .exe~
-*.dil
+*.dll
 *.so
+.gocache/
 
 #Test binary,built with 'go test  -c'
 *.test
@@ -18,8 +19,8 @@ vendor/
 *.swp
 *.swo
 
-.DS_Strore
-Thumps.db
+.DS_Store
+Thumbs.db
 
 uploads/
 *.db

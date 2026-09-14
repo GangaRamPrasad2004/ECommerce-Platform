@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/GangaRamPrasad2004/learning-go-shop/internal/config"
+	"github.com/GangaRamPrasad2004/learning-go-shop/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	"gorm.io/gorm"
@@ -14,14 +15,21 @@ type Server struct {
 	config *config.Config
 	db     *gorm.DB
 	logger *zerolog.Logger
+
+	authService    *service.AuthService
+	userService    *service.UserService
+	productService *service.ProductService
 }
 
-// New creates a Server with the supplied configuration, database, and logger.
-func New(cfg *config.Config, db *gorm.DB, logger *zerolog.Logger) *Server {
+// New creates a Server with its shared configuration, database, logger, and services.
+func New(cfg *config.Config, db *gorm.DB, logger *zerolog.Logger, authService *service.AuthService, userService *service.UserService, productService *service.ProductService) *Server {
 	return &Server{
-		config: cfg,
-		db:     db,
-		logger: logger,
+		config:         cfg,
+		db:             db,
+		logger:         logger,
+		authService:    authService,
+		userService:    userService,
+		productService: productService,
 	}
 }
 
