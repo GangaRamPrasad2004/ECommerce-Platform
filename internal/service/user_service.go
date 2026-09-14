@@ -10,10 +10,12 @@ type UserService struct {
 	db *gorm.DB
 }
 
+// NewUserService creates a UserService backed by db.
 func NewUserService(db *gorm.DB) *UserService {
 	return &UserService{db: db}
 }
 
+// GetProfile retrieves the profile information for the specified user.
 func (s *UserService) GetProfile(userID uint) (*dto.UserResponse, error) {
 	var user models.User
 	if err := s.db.First(&user, userID).Error; err != nil {
@@ -33,6 +35,7 @@ func (s *UserService) GetProfile(userID uint) (*dto.UserResponse, error) {
 	}, nil
 }
 
+// UpdateProfile updates a user's profile and returns the updated information.
 func (s *UserService) UpdateProfile(userID uint, req *dto.UpdateProfileRequest) (*dto.UserResponse, error) {
 	var user models.User
 	if err := s.db.First(&user, userID).Error; err != nil {

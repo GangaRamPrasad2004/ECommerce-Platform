@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (s *Server) CreateCategory(c *gin.Context) {
+func (s *Server) createCategory(c *gin.Context) {
 	var req dto.CreateCategoryRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		utils.BadRequestResponse(c, "invalid request data", err)
@@ -72,6 +72,22 @@ func (s *Server) deleteCategory(c *gin.Context) {
 	}
 
 	utils.SuccessResponse(c, "Category deleted successfully", nil)
+}
+
+func (s *Server) createProduct(c *gin.Context) {
+	var req dto.CreateProductRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		utils.BadRequestResponse(c, "Invalid request data", err)
+		return
+	}
+	productService := service.NewProductService(s.db)
+	product, err := productService.CreateProduct(&req)
+	if err != nil {
+		utils.InternalServerErrorResponse(c, "Failed to create product", err)
+		return
+	}
+
+	utils.CreatedResponse(c, "Product created successfully", product)
 }
 
 func (s *Server) getProduct(c *gin.Context) {
