@@ -13,6 +13,7 @@ import (
 	"github.com/GangaRamPrasad2004/learning-go-shop/internal/config"
 	"github.com/GangaRamPrasad2004/learning-go-shop/internal/database"
 	"github.com/GangaRamPrasad2004/learning-go-shop/internal/logger"
+	providers "github.com/GangaRamPrasad2004/learning-go-shop/internal/provider"
 	"github.com/GangaRamPrasad2004/learning-go-shop/internal/server"
 	"github.com/GangaRamPrasad2004/learning-go-shop/internal/service"
 
@@ -43,7 +44,9 @@ func main() {
 	authService := service.NewAuthService(db, cfg)
 	userService := service.NewUserService(db)
 	productService := service.NewProductService(db)
-	srv := server.New(cfg, db, &log, authService, userService, productService)
+	uploadProvider := providers.NewLocalUploadProvider(cfg.Upload.Path)
+	uploadService := service.NewUploadService(uploadProvider)
+	srv := server.New(cfg, db, &log, authService, userService, productService,uploadService)
 	router := srv.SetupRoutes()
 	httpServer := &http.Server{
 		Addr:         fmt.Sprintf(":%s", cfg.Server.Port),

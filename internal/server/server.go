@@ -15,20 +15,21 @@ type Server struct {
 	config *config.Config
 	db     *gorm.DB
 	logger *zerolog.Logger
-
 	authService    *service.AuthService
 	userService    *service.UserService
 	productService *service.ProductService
+	uploadService  *service.UploadService
 }
 
 // New creates a Server with its shared configuration, database, logger, and services.
-func New(cfg *config.Config, db *gorm.DB, logger *zerolog.Logger, authService *service.AuthService, userService *service.UserService, productService *service.ProductService) *Server {
+func New(cfg *config.Config, db *gorm.DB, logger *zerolog.Logger, authService *service.AuthService, userService *service.UserService, productService *service.ProductService, uploadService *service.UploadService) *Server {
 	return &Server{
 		config:         cfg,
 		db:             db,
 		logger:         logger,
 		authService:    authService,
 		userService:    userService,
+		uploadService:  uploadService,
 		productService: productService,
 	}
 }
@@ -48,6 +49,7 @@ func (s *Server) SetupRoutes() *gin.Engine {
 		})
 	})
 	router.GET("/health", s.healthCheck)
+	router.Static("/uploads", "./uploads")
 
 	api := router.Group("/api/v1")
 	{ // auth routes
@@ -83,7 +85,7 @@ func (s *Server) SetupRoutes() *gin.Engine {
 				productRoutes.POST("/", s.adminMiddleware(), s.createProduct)
 				productRoutes.PUT("/:id", s.adminMiddleware(), s.updateProduct)
 				productRoutes.DELETE("/:id", s.adminMiddleware(), s.deleteProduct)
-
+                productRoutes.POST("/:id/images", s.adminMiddleware(), s.uploadProductImage)
 			}
 		}
 		//public routes
