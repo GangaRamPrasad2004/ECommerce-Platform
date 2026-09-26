@@ -11,7 +11,6 @@ import (
 	"github.com/GangaRamPrasad2004/learning-go-shop/internal/interfaces"
 )
 
-
 type UploadService struct {
 	provider interfaces.UploadProvider
 }
@@ -29,8 +28,8 @@ func (s *UploadService) UploadProductImage(productID uint, file *multipart.FileH
 	if !isValidImageExt(ext) {
 		return "", fmt.Errorf("invalid file type: %s", ext)
 	}
-
-	path := fmt.Sprintf("products/%d/%s%s", productID, uuid.New().String(), ext)
+	newFileName := uuid.New().String()
+	path := fmt.Sprintf("products/%d/%s%s", productID, newFileName, ext)
 
 	return s.provider.UploadFile(file, path)
 }
