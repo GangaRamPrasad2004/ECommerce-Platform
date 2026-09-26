@@ -12,6 +12,7 @@ import (
 
 	"github.com/GangaRamPrasad2004/learning-go-shop/internal/config"
 	"github.com/GangaRamPrasad2004/learning-go-shop/internal/database"
+	"github.com/GangaRamPrasad2004/learning-go-shop/internal/interfaces"
 	"github.com/GangaRamPrasad2004/learning-go-shop/internal/logger"
 	providers "github.com/GangaRamPrasad2004/learning-go-shop/internal/provider"
 	"github.com/GangaRamPrasad2004/learning-go-shop/internal/server"
@@ -41,12 +42,22 @@ func main() {
 		}
 	}()
 	gin.SetMode(cfg.Server.GinMode)
+
 	authService := service.NewAuthService(db, cfg)
 	userService := service.NewUserService(db)
 	productService := service.NewProductService(db)
-	uploadProvider := providers.NewLocalUploadProvider(cfg.Upload.Path)
+
+
+	var uploadProvider interfaces.UploadProvider
+	if cfg.Upload.UploadProvider =="s3"{
+		uploadProvider=providers.NewS3Provider(cfg)
+	}else{
+		uploadProvider=providers.NewLocalUploadProvider(cfg.Upload.Path)
+	}
 	uploadService := service.NewUploadService(uploadProvider)
-	srv := server.New(cfg, db, &log, authService, userService, productService,uploadService)
+
+
+	srv := server.New(cfg, db, &log, authService, userService, productService, uploadService)
 	router := srv.SetupRoutes()
 	httpServer := &http.Server{
 		Addr:         fmt.Sprintf(":%s", cfg.Server.Port),

@@ -12,9 +12,9 @@ import (
 
 // Server manages the application's HTTP server dependencies and routes.
 type Server struct {
-	config *config.Config
-	db     *gorm.DB
-	logger *zerolog.Logger
+	config         *config.Config //nolint:gofmt
+	db             *gorm.DB
+	logger         *zerolog.Logger
 	authService    *service.AuthService
 	userService    *service.UserService
 	productService *service.ProductService
@@ -37,7 +37,7 @@ func New(cfg *config.Config, db *gorm.DB, logger *zerolog.Logger, authService *s
 // SetupRoutes configures and returns the application's HTTP router.
 func (s *Server) SetupRoutes() *gin.Engine {
 	router := gin.New()
-	// add MiddlleWares
+	// add MiddleWares
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 	router.Use(s.corsMiddleware())
@@ -85,7 +85,7 @@ func (s *Server) SetupRoutes() *gin.Engine {
 				productRoutes.POST("/", s.adminMiddleware(), s.createProduct)
 				productRoutes.PUT("/:id", s.adminMiddleware(), s.updateProduct)
 				productRoutes.DELETE("/:id", s.adminMiddleware(), s.deleteProduct)
-                productRoutes.POST("/:id/images", s.adminMiddleware(), s.uploadProductImage)
+				productRoutes.POST("/:id/images", s.adminMiddleware(), s.uploadProductImage)
 			}
 		}
 		//public routes
