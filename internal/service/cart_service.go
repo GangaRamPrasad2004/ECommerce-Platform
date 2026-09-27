@@ -83,9 +83,10 @@ func (s *CartService) UpdateCartItem(userID uint, itemID uint, req *dto.UpdateCa
 	return s.GetCart(userID)
 }
 
-func (s *CartService) DeleteCartItem(userID uint, itemID uint) error {
-	return s.db.Joins("Join carts ON cart_items.cart_id = carts.id").
-		Where("cart_items.id=? AND carts.user_id =? ", itemID, userID).
+func (s *CartService) RemoveFromCart(userID, itemID uint) error {
+	return s.db.Where("id = ? AND cart_id IN (?)", itemID,
+		s.db.Select("id").Table("carts").
+			Where("user_id = ?", userID)).
 		Delete(&models.CartItem{}).Error
 }
 
