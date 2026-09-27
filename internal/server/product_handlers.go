@@ -133,7 +133,6 @@ func (s *Server) deleteProduct(c *gin.Context) {
 	utils.SuccessResponse(c, "Product deleted successfully", nil)
 }
 
-
 func (s *Server) uploadProductImage(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {

@@ -47,17 +47,16 @@ func main() {
 	userService := service.NewUserService(db)
 	productService := service.NewProductService(db)
 
-
 	var uploadProvider interfaces.UploadProvider
-	if cfg.Upload.UploadProvider =="s3"{
-		uploadProvider=providers.NewS3Provider(cfg)
-	}else{
-		uploadProvider=providers.NewLocalUploadProvider(cfg.Upload.Path)
+	if cfg.Upload.UploadProvider == "s3" {
+		uploadProvider = providers.NewS3Provider(cfg)
+	} else {
+		uploadProvider = providers.NewLocalUploadProvider(cfg.Upload.Path)
 	}
 	uploadService := service.NewUploadService(uploadProvider)
+	cartService := service.NewCartService(db)
 
-
-	srv := server.New(cfg, db, &log, authService, userService, productService, uploadService)
+	srv := server.New(cfg, db, &log, authService, userService, productService, uploadService, cartService)
 	router := srv.SetupRoutes()
 	httpServer := &http.Server{
 		Addr:         fmt.Sprintf(":%s", cfg.Server.Port),

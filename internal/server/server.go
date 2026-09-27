@@ -19,10 +19,11 @@ type Server struct {
 	userService    *service.UserService
 	productService *service.ProductService
 	uploadService  *service.UploadService
+	cartService    *service.CartService
 }
 
 // New creates a Server with its shared configuration, database, logger, and services.
-func New(cfg *config.Config, db *gorm.DB, logger *zerolog.Logger, authService *service.AuthService, userService *service.UserService, productService *service.ProductService, uploadService *service.UploadService) *Server {
+func New(cfg *config.Config, db *gorm.DB, logger *zerolog.Logger, authService *service.AuthService, userService *service.UserService, productService *service.ProductService, uploadService *service.UploadService, cartService *service.CartService) *Server {
 	return &Server{
 		config:         cfg,
 		db:             db,
@@ -31,6 +32,7 @@ func New(cfg *config.Config, db *gorm.DB, logger *zerolog.Logger, authService *s
 		userService:    userService,
 		uploadService:  uploadService,
 		productService: productService,
+		cartService:    cartService,
 	}
 }
 
@@ -87,11 +89,21 @@ func (s *Server) SetupRoutes() *gin.Engine {
 				productRoutes.DELETE("/:id", s.adminMiddleware(), s.deleteProduct)
 				productRoutes.POST("/:id/images", s.adminMiddleware(), s.uploadProductImage)
 			}
+			// cart routes
+
+			cart := protected.Group("/carts")
+			{
+				cartRoutes := cart
+				cartRoutes.GET("/", s.getCart)
+				cartRoutes.POST("/items", s.addToCart)
+				cartRoutes.PUT("/items/:id", s.updateCart)
+				cartRoutes.DELETE("/items/:id", s.removeFromCart)
+			}
 		}
-		//public routes
+		// public routes
 		api.GET("/categories", s.getCategories)
 		//api.GET("/search", s.searchProducts)
-		//api.GET("/products", s.getProducts)
+		// api.GET("/products", s.getProducts)
 		api.GET("/products/:id", s.getProduct)
 	}
 
