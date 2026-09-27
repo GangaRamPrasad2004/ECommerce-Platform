@@ -62,7 +62,7 @@ func (s *Server) removeFromCart(c *gin.Context) {
 		return
 	}
 
-	if err := s.cartService.DeleteCartItem(UserID, uint(id)); err != nil {
+	if err := s.cartService.RemoveFromCart(UserID, uint(id)); err != nil {
 		utils.BadRequestResponse(c, "failed to remove item from cart", err)
 		return
 	}

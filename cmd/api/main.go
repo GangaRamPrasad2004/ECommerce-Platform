@@ -55,8 +55,8 @@ func main() {
 	}
 	uploadService := service.NewUploadService(uploadProvider)
 	cartService := service.NewCartService(db)
-
-	srv := server.New(cfg, db, &log, authService, userService, productService, uploadService, cartService)
+  orderService :=service.NewOrderService(db)
+	srv := server.New(cfg, db, &log, authService, userService, productService, uploadService, cartService, orderService)
 	router := srv.SetupRoutes()
 	httpServer := &http.Server{
 		Addr:         fmt.Sprintf(":%s", cfg.Server.Port),

@@ -20,10 +20,11 @@ type Server struct {
 	productService *service.ProductService
 	uploadService  *service.UploadService
 	cartService    *service.CartService
+	orderService   *service.OrderService
 }
 
 // New creates a Server with its shared configuration, database, logger, and services.
-func New(cfg *config.Config, db *gorm.DB, logger *zerolog.Logger, authService *service.AuthService, userService *service.UserService, productService *service.ProductService, uploadService *service.UploadService, cartService *service.CartService) *Server {
+func New(cfg *config.Config, db *gorm.DB, logger *zerolog.Logger, authService *service.AuthService, userService *service.UserService, productService *service.ProductService, uploadService *service.UploadService, cartService *service.CartService, orderService *service.OrderService) *Server {
 	return &Server{
 		config:         cfg,
 		db:             db,
@@ -33,6 +34,7 @@ func New(cfg *config.Config, db *gorm.DB, logger *zerolog.Logger, authService *s
 		uploadService:  uploadService,
 		productService: productService,
 		cartService:    cartService,
+		orderService:   orderService,
 	}
 }
 
@@ -98,6 +100,14 @@ func (s *Server) SetupRoutes() *gin.Engine {
 				cartRoutes.POST("/items", s.addToCart)
 				cartRoutes.PUT("/items/:id", s.updateCart)
 				cartRoutes.DELETE("/items/:id", s.removeFromCart)
+			}
+			// order routes
+			orders := protected.Group("/orders")
+			{
+				orderRoutes := orders
+				orderRoutes.POST("/", s.createOrder)
+				orderRoutes.GET("/", s.getOrders)
+				orderRoutes.GET("/:id", s.getOrder)
 			}
 		}
 		// public routes
