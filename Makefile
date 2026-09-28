@@ -1,4 +1,4 @@
-.PHONY: help run build dev lint format migrate-create migrate-up migrate-down docker-up docker-down
+.PHONY: help run build dev lint format migrate-create migrate-up migrate-down docker-up docker-down docs-generate
 
 help:
 	@echo "Available commands:"
@@ -27,7 +27,12 @@ lint:format
 
 format:
 	gofmt -s -w .
-	
+	goimports -w .
+
+
+docs-generate:
+	mkdir -p docs
+	swag init -g cmd/api/main.go -o docs --parseDependency --parseInternal --exclude .git,docs,docker,db
 
 migrate-create:
 	migrate create -ext sql -dir db/migrations -seq $(name)

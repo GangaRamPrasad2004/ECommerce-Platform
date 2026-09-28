@@ -3,7 +3,7 @@ package server
 import (
 	"strconv"
 
-	//"github.com/GangaRamPrasad2004/learning-go-shop/internal/dto"
+	_ "github.com/GangaRamPrasad2004/learning-go-shop/internal/dto"
 	"github.com/GangaRamPrasad2004/learning-go-shop/internal/utils"
 	"github.com/gin-gonic/gin"
 )
@@ -11,7 +11,7 @@ import (
 // @Summary Create an order
 // @Description Create an order from the current user's cart
 // @Tags Orders
-// @Produce JSON
+// @Produce json
 // @Security BearerAuth
 // @Success 201 {object} utils.Response{data=dto.OrderResponse} "Order created successfully"
 // @Failure 400 {object} utils.Response "Cart is empty or insufficient stock"
@@ -28,6 +28,7 @@ func (s *Server) createOrder(c *gin.Context) {
 
 	utils.CreatedResponse(c, "Order created successfully", order)
 }
+
 
 // @Summary Get user's orders
 // @Description Retrieve paginated list of user's orders
@@ -58,7 +59,7 @@ func (s *Server) getOrders(c *gin.Context) {
 // @Summary Get order by ID
 // @Description Retrieve detailed information about a specific order
 // @Tags Orders
-// @Produce JSON
+// @Produce json
 // @Security BearerAuth
 // @Param id path int true "Order ID"
 // @Success 200 {object} utils.Response{data=dto.OrderResponse} "Order retrieved successfully"

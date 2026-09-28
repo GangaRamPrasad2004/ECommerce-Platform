@@ -1,9 +1,8 @@
 package service
 
 import (
-	 "errors"
-	 "fmt"
-
+	"errors"
+	"fmt"
 
 	"github.com/GangaRamPrasad2004/learning-go-shop/internal/dto"
 	"github.com/GangaRamPrasad2004/learning-go-shop/internal/models"
