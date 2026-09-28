@@ -74,7 +74,7 @@ func main() {
 
 	gin.SetMode(cfg.Server.GinMode)
 
-	authService := service.NewAuthService(db, cfg,eventPublisher)
+	authService := service.NewAuthService(db, cfg, eventPublisher)
 	userService := service.NewUserService(db)
 	productService := service.NewProductService(db)
 

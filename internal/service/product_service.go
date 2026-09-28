@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// ProductService manages product catalog data.
 type ProductService struct {
 	db *gorm.DB
 }
@@ -187,6 +188,7 @@ func (s *ProductService) DeleteProduct(id uint) error {
 	return s.db.Delete(&models.Product{}, id).Error
 }
 
+// AddProductImage associates an image with a product.
 func (s *ProductService) AddProductImage(productID uint, url, altText string) error {
 
 	var count int64
@@ -202,6 +204,7 @@ func (s *ProductService) AddProductImage(productID uint, url, altText string) er
 	return s.db.Create(&image).Error
 }
 
+// SearchProducts returns products matching the supplied search criteria.
 func (s *ProductService) SearchProducts(req *dto.SearchProductsRequest) ([]dto.ProductSearchResult, *utils.PaginationMeta, error) {
 
 	if req.Page < 1 {

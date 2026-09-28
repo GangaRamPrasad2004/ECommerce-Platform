@@ -8,14 +8,17 @@ import (
 	"gorm.io/gorm"
 )
 
+// CartService manages shopping carts and their items.
 type CartService struct {
 	db *gorm.DB
 }
 
+// NewCartService creates a cart service backed by db.
 func NewCartService(db *gorm.DB) *CartService {
 	return &CartService{db: db}
 }
 
+// GetCart returns the cart belonging to the specified user.
 func (s *CartService) GetCart(userID uint) (*dto.CartResponse, error) {
 	var cart models.Cart
 	err := s.db.Preload("CartItems.Product.Category").
@@ -26,6 +29,7 @@ func (s *CartService) GetCart(userID uint) (*dto.CartResponse, error) {
 	return s.convertToCartResponse(&cart), nil
 }
 
+// AddToCart adds a product quantity to the user's cart.
 func (s *CartService) AddToCart(userID uint, req *dto.AddToCartRequest) (*dto.CartResponse, error) {
 	var product models.Product
 	if err := s.db.First(&product).Error; err != nil {
@@ -62,6 +66,7 @@ func (s *CartService) AddToCart(userID uint, req *dto.AddToCartRequest) (*dto.Ca
 
 }
 
+// UpdateCartItem changes the quantity of an item in the user's cart.
 func (s *CartService) UpdateCartItem(userID uint, itemID uint, req *dto.UpdateCartItemRequest) (*dto.CartResponse, error) {
 	var cartItem models.CartItem
 	if err := s.db.Joins("JOIN carts ON cart_items.cart_id = carts.id").
@@ -83,6 +88,7 @@ func (s *CartService) UpdateCartItem(userID uint, itemID uint, req *dto.UpdateCa
 	return s.GetCart(userID)
 }
 
+// RemoveFromCart removes an item from the user's cart.
 func (s *CartService) RemoveFromCart(userID, itemID uint) error {
 	return s.db.Where("id = ? AND cart_id IN (?)", itemID,
 		s.db.Select("id").Table("carts").

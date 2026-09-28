@@ -51,6 +51,7 @@ type AWSConfig struct {
 	EventQueueName  string
 }
 
+// SMTPConfig contains SMTP server settings.
 type SMTPConfig struct {
 	Host     string
 	Port     int

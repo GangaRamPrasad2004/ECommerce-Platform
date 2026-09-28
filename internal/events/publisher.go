@@ -1,5 +1,6 @@
 package events
 
+// Publisher publishes events and releases its underlying resources.
 type Publisher interface {
 	Publish(eventType string, payload any, metadata map[string]string) error
 	Close() error

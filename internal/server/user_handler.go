@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
 // @Summary Get user profile
 // @Description Get current authenticated user's profile information
 // @Tags User

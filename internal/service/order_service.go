@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// OrderService manages orders created from shopping carts.
 type OrderService struct {
 	db *gorm.DB
 }
@@ -19,6 +20,7 @@ func NewOrderService(db *gorm.DB) *OrderService {
 	return &OrderService{db: db}
 }
 
+// CreateOrder creates an order from the user's current cart.
 func (s *OrderService) CreateOrder(userID uint) (*dto.OrderResponse, error) {
 	var orderResponse *dto.OrderResponse
 
@@ -95,6 +97,7 @@ func (s *OrderService) CreateOrder(userID uint) (*dto.OrderResponse, error) {
 
 }
 
+// GetOrders returns a paginated list of orders for the specified user.
 func (s *OrderService) GetOrders(userID uint, page, limit int) ([]dto.OrderResponse, *utils.PaginationMeta, error) {
 	if page < 1 {
 		page = 1
@@ -138,6 +141,7 @@ func (s *OrderService) GetOrders(userID uint, page, limit int) ([]dto.OrderRespo
 	return response, meta, nil
 }
 
+// GetOrder returns an order belonging to the specified user.
 func (s *OrderService) GetOrder(userID, orderID uint) (*dto.OrderResponse, error) {
 	var order models.Order
 	if err := s.db.Preload("OrderItems.Product.Category").

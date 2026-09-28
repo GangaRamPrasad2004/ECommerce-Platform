@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// UserService manages user profile data.
 type UserService struct {
 	db *gorm.DB
 }

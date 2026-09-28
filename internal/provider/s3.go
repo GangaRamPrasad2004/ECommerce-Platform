@@ -14,6 +14,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
+// S3Provider stores uploaded files in an Amazon S3-compatible service.
 type S3Provider struct {
 	client   *s3.Client
 	uploader *manager.Uploader
@@ -21,6 +22,7 @@ type S3Provider struct {
 	endpoint string
 }
 
+// NewS3Provider creates an S3 provider from the application configuration.
 func NewS3Provider(cfg *appconfig.Config) *S3Provider {
 	awsCfg, err := config.LoadDefaultConfig(context.TODO(),
 		config.WithRegion(cfg.AWS.Region),
@@ -48,6 +50,7 @@ func NewS3Provider(cfg *appconfig.Config) *S3Provider {
 	}
 }
 
+// UploadFile uploads a multipart file to the requested object path.
 func (p *S3Provider) UploadFile(file *multipart.FileHeader, path string) (string, error) {
 
 	log.Printf("Uploading file %s using s3", path)
@@ -67,6 +70,7 @@ func (p *S3Provider) UploadFile(file *multipart.FileHeader, path string) (string
 	return *result.Key, nil
 }
 
+// DeleteFile removes a previously uploaded S3 object.
 func (p *S3Provider) DeleteFile(path string) error {
 	_, err := p.client.DeleteObject(context.TODO(), &s3.DeleteObjectInput{
 		Bucket: aws.String(p.bucket),

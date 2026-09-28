@@ -35,7 +35,6 @@ func (s *Server) createCategory(c *gin.Context) {
 	utils.CreatedResponse(c, "category created successfully", category)
 }
 
-
 // @Summary Get all categories
 // @Description Retrieve all active categories
 // @Tags Categories
@@ -52,7 +51,6 @@ func (s *Server) getCategories(c *gin.Context) {
 
 	utils.SuccessResponse(c, "Categories retrieved successfully", categories)
 }
-
 
 // @Summary Update a category
 // @Description Update an existing category (Admin only)
@@ -89,7 +87,6 @@ func (s *Server) updateCategory(c *gin.Context) {
 
 }
 
-
 // @Summary Delete a category
 // @Description Delete a category (Admin only)
 // @Tags Categories
@@ -113,7 +110,6 @@ func (s *Server) deleteCategory(c *gin.Context) {
 
 	utils.SuccessResponse(c, "Category deleted successfully", nil)
 }
-
 
 // @Summary Create a new product
 // @Description Create a new product (Admin only)
@@ -141,7 +137,6 @@ func (s *Server) createProduct(c *gin.Context) {
 
 	utils.CreatedResponse(c, "Product created successfully", product)
 }
-
 
 // @Summary Get all products
 // @Description Retrieve paginated list of active products
@@ -223,7 +218,6 @@ func (s *Server) updateProduct(c *gin.Context) {
 	utils.SuccessResponse(c, "Product updated successfully", product)
 }
 
-
 // @Summary Delete a product
 // @Description Delete a product (Admin only)
 // @Tags Products
@@ -247,7 +241,6 @@ func (s *Server) deleteProduct(c *gin.Context) {
 
 	utils.SuccessResponse(c, "Product deleted successfully", nil)
 }
-
 
 // @Summary Upload product image
 // @Description Upload an image for a product (Admin only)

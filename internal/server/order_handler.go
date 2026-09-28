@@ -29,7 +29,6 @@ func (s *Server) createOrder(c *gin.Context) {
 	utils.CreatedResponse(c, "Order created successfully", order)
 }
 
-
 // @Summary Get user's orders
 // @Description Retrieve paginated list of user's orders
 // @Tags Orders

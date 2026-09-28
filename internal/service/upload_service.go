@@ -11,14 +11,17 @@ import (
 	"github.com/GangaRamPrasad2004/learning-go-shop/internal/interfaces"
 )
 
+// UploadService validates and stores product image uploads.
 type UploadService struct {
 	provider interfaces.UploadProvider
 }
 
+// NewUploadService creates an upload service using provider.
 func NewUploadService(provider interfaces.UploadProvider) *UploadService {
 	return &UploadService{provider: provider}
 }
 
+// UploadProductImage validates and stores an image for the specified product.
 func (s *UploadService) UploadProductImage(productID uint, file *multipart.FileHeader) (string, error) {
 	if file == nil {
 		return "", fmt.Errorf("file is required")

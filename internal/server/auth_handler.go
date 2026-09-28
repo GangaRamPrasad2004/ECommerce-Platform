@@ -77,7 +77,6 @@ func (s *Server) refreshToken(c *gin.Context) {
 	utils.SuccessResponse(c, "Token refreshed successfully", response)
 }
 
-
 // @Summary User logout
 // @Description Invalidate refresh token and logout user
 // @Tags Authentication
@@ -100,4 +99,3 @@ func (s *Server) logout(c *gin.Context) {
 
 	utils.SuccessResponse(c, "Logout successful", nil)
 }
-

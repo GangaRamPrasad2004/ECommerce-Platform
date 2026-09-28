@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-
 // @Summary Get user's cart
 // @Description Retrieve current user's shopping cart with all items
 // @Tags Cart
@@ -28,7 +27,6 @@ func (s *Server) getCart(c *gin.Context) {
 	}
 	utils.SuccessResponse(c, "cart retrieved", cart)
 }
-
 
 // @Summary Add item to cart
 // @Description Add a product to the user's shopping cart
@@ -88,7 +86,6 @@ func (s *Server) updateCart(c *gin.Context) {
 	}
 	utils.SuccessResponse(c, "cart updated to cart", cart)
 }
-
 
 // @Summary Remove item from cart
 // @Description Remove an item from the user's shopping cart

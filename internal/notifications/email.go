@@ -6,6 +6,7 @@ import (
 	"net/smtp"
 )
 
+// SMTPConfig contains SMTP server settings.
 type SMTPConfig struct {
 	Host     string
 	Port     int
@@ -14,22 +15,26 @@ type SMTPConfig struct {
 	From     string
 }
 
+// SimpleEmail contains the fields required to send an email.
 type SimpleEmail struct {
 	To      string
 	Subject string
 	Body    string
 }
 
+// EmailNotifier sends email notifications through an SMTP server.
 type EmailNotifier struct {
 	config *SMTPConfig
 }
 
+// NewEmailNotifier creates an email notifier with the provided SMTP settings.
 func NewEmailNotifier(config *SMTPConfig) *EmailNotifier {
 	return &EmailNotifier{
 		config: config,
 	}
 }
 
+// SendSimpleEmail sends the supplied email through the configured SMTP server.
 func (e *EmailNotifier) SendSimpleEmail(email *SimpleEmail) error {
 	addr := fmt.Sprintf("%s:%d", e.config.Host, e.config.Port)
 
@@ -82,6 +87,7 @@ func (e *EmailNotifier) SendSimpleEmail(email *SimpleEmail) error {
 	return w.Close()
 }
 
+// SendLoginNotification sends a notification after a successful login.
 func (e *EmailNotifier) SendLoginNotification(userEmail, userName string) error {
 	email := &SimpleEmail{
 		To:      userEmail,
