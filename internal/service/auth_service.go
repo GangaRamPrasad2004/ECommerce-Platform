@@ -7,6 +7,7 @@ import (
 
 	"github.com/GangaRamPrasad2004/learning-go-shop/internal/config"
 	"github.com/GangaRamPrasad2004/learning-go-shop/internal/dto"
+	"github.com/GangaRamPrasad2004/learning-go-shop/internal/events"
 	"github.com/GangaRamPrasad2004/learning-go-shop/internal/models"
 	"github.com/GangaRamPrasad2004/learning-go-shop/internal/utils"
 	"gorm.io/gorm"
@@ -14,15 +15,17 @@ import (
 
 // AuthService handles user registration, authentication, and token lifecycle operations.
 type AuthService struct {
-	db     *gorm.DB
-	config *config.Config
+	db             *gorm.DB
+	config         *config.Config
+	eventPublisher events.Publisher
 }
 
 // NewAuthService creates an AuthService backed by db and configured with config.
-func NewAuthService(db *gorm.DB, config *config.Config) *AuthService {
+func NewAuthService(db *gorm.DB, config *config.Config, eventPublisher events.Publisher) *AuthService {
 	return &AuthService{
-		db:     db,
-		config: config,
+		db:             db,
+		config:         config,
+		eventPublisher: eventPublisher,
 	}
 
 }
@@ -109,6 +112,12 @@ func (s *AuthService) generatedAuthResponse(user *models.User) (*dto.AuthRespons
 		ExpiresAt: time.Now().Add(s.config.JWT.RefreshTokenExpires),
 	}
 	s.db.Create(&refreshTokenModel)
+
+	err = s.eventPublisher.Publish("UserLoggedIn", user, map[string]string{})
+	if err != nil {
+		return nil, fmt.Errorf("unable to publish user login event: %w", err)
+	}
+
 	return &dto.AuthResponse{
 		User: dto.UserResponse{
 			ID:        user.ID,

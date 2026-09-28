@@ -3,4 +3,7 @@
 # create bucket
 awslocal s3 mb s3://ecommerce-uploads
 
-echo"LocalStack intialization complete"
+# Create SQS queue
+awslocal sqs create-queue --queue-name ecommerce-events
+
+echo"LocalStack initialization complete"
