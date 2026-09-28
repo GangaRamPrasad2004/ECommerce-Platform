@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 
-	providers "github.com/GangaRamPrasad2004/learning-go-shop/internal/provider"
+	providers "github.com/GangaRamPrasad2004/ECommerce-Platform/internal/provider"
 
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-aws/sqs"
 	"github.com/ThreeDotsLabs/watermill/message"
 
-	appconfig "github.com/GangaRamPrasad2004/learning-go-shop/internal/config"
+	appconfig "github.com/GangaRamPrasad2004/ECommerce-Platform/internal/config"
 	_ "github.com/aws/smithy-go/endpoints"
 )
 

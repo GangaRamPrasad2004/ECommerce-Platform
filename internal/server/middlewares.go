@@ -3,8 +3,8 @@ package server
 import (
 	"strings"
 
-	"github.com/GangaRamPrasad2004/learning-go-shop/internal/models"
-	"github.com/GangaRamPrasad2004/learning-go-shop/internal/utils"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/models"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 

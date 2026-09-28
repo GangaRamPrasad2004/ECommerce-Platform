@@ -4,9 +4,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/GangaRamPrasad2004/learning-go-shop/internal/dto"
-	"github.com/GangaRamPrasad2004/learning-go-shop/internal/models"
-	"github.com/GangaRamPrasad2004/learning-go-shop/internal/utils"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/dto"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/models"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/utils"
 	"gorm.io/gorm"
 )
 

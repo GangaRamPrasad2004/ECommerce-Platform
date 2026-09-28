@@ -3,9 +3,9 @@ package server
 import (
 	"net/http"
 
-	_ "github.com/GangaRamPrasad2004/learning-go-shop/docs"
-	"github.com/GangaRamPrasad2004/learning-go-shop/internal/config"
-	"github.com/GangaRamPrasad2004/learning-go-shop/internal/service"
+	_ "github.com/GangaRamPrasad2004/ECommerce-Platform/docs"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/config"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog"
 	swaggerFiles "github.com/swaggo/files"

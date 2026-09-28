@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/GangaRamPrasad2004/learning-go-shop/internal/config"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/config"
 	"github.com/golang-jwt/jwt/v5"
 )
 

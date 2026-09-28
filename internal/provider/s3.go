@@ -6,7 +6,7 @@ import (
 	"mime/multipart"
 	"strings"
 
-	appconfig "github.com/GangaRamPrasad2004/learning-go-shop/internal/config"
+	appconfig "github.com/GangaRamPrasad2004/ECommerce-Platform/internal/config"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"

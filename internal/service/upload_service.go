@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/GangaRamPrasad2004/learning-go-shop/internal/interfaces"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/interfaces"
 )
 
 // UploadService validates and stores product image uploads.

@@ -10,14 +10,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/GangaRamPrasad2004/learning-go-shop/internal/config"
-	"github.com/GangaRamPrasad2004/learning-go-shop/internal/database"
-	"github.com/GangaRamPrasad2004/learning-go-shop/internal/events"
-	"github.com/GangaRamPrasad2004/learning-go-shop/internal/interfaces"
-	"github.com/GangaRamPrasad2004/learning-go-shop/internal/logger"
-	providers "github.com/GangaRamPrasad2004/learning-go-shop/internal/provider"
-	"github.com/GangaRamPrasad2004/learning-go-shop/internal/server"
-	"github.com/GangaRamPrasad2004/learning-go-shop/internal/service"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/config"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/database"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/events"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/interfaces"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/logger"
+	providers "github.com/GangaRamPrasad2004/ECommerce-Platform/internal/provider"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/server"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/service"
 
 	"github.com/gin-gonic/gin"
 )

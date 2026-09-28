@@ -1,4 +1,4 @@
-module github.com/GangaRamPrasad2004/learning-go-shop
+module github.com/GangaRamPrasad2004/ECommerce-Platform
 
 go 1.26.0
 

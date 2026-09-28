@@ -3,8 +3,8 @@ package server
 import (
 	"strconv"
 
-	"github.com/GangaRamPrasad2004/learning-go-shop/internal/dto"
-	"github.com/GangaRamPrasad2004/learning-go-shop/internal/utils"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/dto"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/utils"
 	"github.com/gin-gonic/gin"
 )
 
