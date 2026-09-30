@@ -127,6 +127,8 @@ func (s *AuthService) generatedAuthResponse(user *models.User) (*dto.AuthRespons
 			Phone:     user.Phone,
 			Role:      string(user.Role),
 			IsActive:  user.IsActive,
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
 		},
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
