@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"net/smtp"
+	"strconv"
 )
 
 // SMTPConfig contains SMTP server settings.
@@ -36,13 +37,14 @@ func NewEmailNotifier(config *SMTPConfig) *EmailNotifier {
 
 // SendSimpleEmail sends the supplied email through the configured SMTP server.
 func (e *EmailNotifier) SendSimpleEmail(email *SimpleEmail) error {
-	addr := fmt.Sprintf("%s:%d", e.config.Host, e.config.Port)
+	addr := net.JoinHostPort(e.config.Host, strconv.Itoa(e.config.Port))
 
 	// Connect directly without TLS for development
 	conn, err := net.Dial("tcp", addr)
 	if err != nil {
 		return err
 	}
+	//nolint:errcheck // Best-effort close; the connection is discarded after SMTP use.
 	defer conn.Close()
 
 	client, err := smtp.NewClient(conn, e.config.Host)

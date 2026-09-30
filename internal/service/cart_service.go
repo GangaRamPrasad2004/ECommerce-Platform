@@ -8,6 +8,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var _ CartServiceInterface = (*CartService)(nil)
+
 // CartService manages shopping carts and their items.
 type CartService struct {
 	db *gorm.DB
@@ -67,7 +69,7 @@ func (s *CartService) AddToCart(userID uint, req *dto.AddToCartRequest) (*dto.Ca
 }
 
 // UpdateCartItem changes the quantity of an item in the user's cart.
-func (s *CartService) UpdateCartItem(userID uint, itemID uint, req *dto.UpdateCartItemRequest) (*dto.CartResponse, error) {
+func (s *CartService) UpdateCartItem(userID, itemID uint, req *dto.UpdateCartItemRequest) (*dto.CartResponse, error) {
 	var cartItem models.CartItem
 	if err := s.db.Joins("JOIN carts ON cart_items.cart_id = carts.id").
 		Where("cart_items.id=? AND carts.user_id =? ", itemID, userID).
@@ -132,5 +134,7 @@ func (s *CartService) convertToCartResponse(cart *models.Cart) *dto.CartResponse
 		UserID:    cart.UserID,
 		CartItems: cartItems,
 		Total:     total,
+		CreatedAt: cart.CreatedAt,
+		UpdatedAt: cart.UpdatedAt,
 	}
 }

@@ -11,6 +11,8 @@ import (
 	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/interfaces"
 )
 
+var _ UploadServiceInterface = (*UploadService)(nil)
+
 // UploadService validates and stores product image uploads.
 type UploadService struct {
 	provider interfaces.UploadProvider

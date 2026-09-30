@@ -13,6 +13,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var _ AuthServiceInterface = (*AuthService)(nil)
+
 // AuthService handles user registration, authentication, and token lifecycle operations.
 type AuthService struct {
 	db             *gorm.DB
@@ -21,10 +23,10 @@ type AuthService struct {
 }
 
 // NewAuthService creates an AuthService backed by db and configured with config.
-func NewAuthService(db *gorm.DB, config *config.Config, eventPublisher events.Publisher) *AuthService {
+func NewAuthService(db *gorm.DB, cfg *config.Config, eventPublisher events.Publisher) *AuthService {
 	return &AuthService{
 		db:             db,
-		config:         config,
+		config:         cfg,
 		eventPublisher: eventPublisher,
 	}
 
@@ -127,6 +129,8 @@ func (s *AuthService) generatedAuthResponse(user *models.User) (*dto.AuthRespons
 			Phone:     user.Phone,
 			Role:      string(user.Role),
 			IsActive:  user.IsActive,
+			CreatedAt: user.CreatedAt,
+			UpdatedAt: user.UpdatedAt,
 		},
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,

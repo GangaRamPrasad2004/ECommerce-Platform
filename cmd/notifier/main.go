@@ -58,7 +58,9 @@ func main() {
 	// Subscribe to messages
 	messages, err := subscriber.Subscribe(ctx, cfg.AWS.EventQueueName)
 	if err != nil {
-		subscriber.Close()
+		if closeErr := subscriber.Close(); closeErr != nil {
+			log.Printf("failed to close subscriber: %v", closeErr)
+		}
 		log.Fatalf("Failed to subscribe to queue: %v", err)
 	}
 
@@ -79,7 +81,9 @@ func main() {
 			}
 		case <-sigChan:
 			log.Println("Shutting down notification service...")
-			subscriber.Close()
+			if closeErr := subscriber.Close(); closeErr != nil {
+				log.Printf("failed to close subscriber: %v", closeErr)
+			}
 			return
 		}
 	}
