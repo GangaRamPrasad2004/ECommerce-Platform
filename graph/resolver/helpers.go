@@ -3,9 +3,12 @@ package resolver
 import (
 	"context"
 	"errors"
+
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/utils"
 )
 
 var (
+	// ErrUnauthorized indicates a missing or invalid user context in the GraphQL request.
 	ErrUnauthorized = errors.New("unauthorized")
 )
 
@@ -13,9 +16,9 @@ const (
 	adminRole = "admin"
 )
 
-// GetUserIDFromContext functions to extract user info from GraphQL context
+// GetUserIDFromContext extracts the authenticated user ID from the GraphQL context.
 func GetUserIDFromContext(ctx context.Context) (uint, error) {
-	userID := ctx.Value("user_id")
+	userID := ctx.Value(utils.UserIDKey)
 	if userID == nil {
 		return 0, ErrUnauthorized
 	}
@@ -27,8 +30,9 @@ func GetUserIDFromContext(ctx context.Context) (uint, error) {
 	return 0, ErrUnauthorized
 }
 
+// GetUserRoleFromContext extracts the authenticated user role from the GraphQL context.
 func GetUserRoleFromContext(ctx context.Context) (string, error) {
-	userRole := ctx.Value("user_role")
+	userRole := ctx.Value(utils.UserRoleKey)
 	if userRole == nil {
 		return "", ErrUnauthorized
 	}
@@ -40,6 +44,7 @@ func GetUserRoleFromContext(ctx context.Context) (string, error) {
 	return "", ErrUnauthorized
 }
 
+// IsAdminFromContext reports whether the current request has the admin role.
 func IsAdminFromContext(ctx context.Context) bool {
 	role, err := GetUserRoleFromContext(ctx)
 	if err != nil {

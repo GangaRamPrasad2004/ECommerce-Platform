@@ -21,10 +21,10 @@ type AuthService struct {
 }
 
 // NewAuthService creates an AuthService backed by db and configured with config.
-func NewAuthService(db *gorm.DB, config *config.Config, eventPublisher events.Publisher) *AuthService {
+func NewAuthService(db *gorm.DB, cfg *config.Config, eventPublisher events.Publisher) *AuthService {
 	return &AuthService{
 		db:             db,
-		config:         config,
+		config:         cfg,
 		eventPublisher: eventPublisher,
 	}
 

@@ -15,7 +15,7 @@ import (
 
 // Server manages the application's HTTP server dependencies and routes.
 type Server struct {
-	config         *config.Config //nolint:gofmt
+	config         *config.Config //nolint:gofmt // Field alignment is intentional for readability and existing config shape.
 	db             *gorm.DB
 	logger         *zerolog.Logger
 	authService    *service.AuthService
@@ -78,66 +78,50 @@ func (s *Server) SetupRoutes() *gin.Engine {
 	router.Static("/uploads", "./uploads")
 
 	api := router.Group("/api/v1")
-	{ // auth routes
-		auth := api.Group("/auth")
-		{
-			auth.POST("/register", s.register)
-			auth.POST("/login", s.login)
-			auth.POST("/refresh", s.refreshToken)
-			auth.POST("/logout", s.logout)
-		}
-		protected := api.Group("/")
-		protected.Use(s.authMiddleware())
-		{
-			// User routes
-			users := protected.Group("/users")
-			{
-				userRoutes := users
-				userRoutes.GET("/profile", s.getProfile)
-				userRoutes.PUT("/profile", s.updateProfile)
-			}
-			categories := protected.Group("/categories")
-			{
-				categoryRoute := categories
-				categoryRoute.POST("/", s.adminMiddleware(), s.createCategory)
-				categoryRoute.PUT("/:id", s.adminMiddleware(), s.updateCategory)
-				categoryRoute.DELETE("/:id", s.adminMiddleware(), s.deleteCategory)
-			}
+	auth := api.Group("/auth")
+	auth.POST("/register", s.register)
+	auth.POST("/login", s.login)
+	auth.POST("/refresh", s.refreshToken)
+	auth.POST("/logout", s.logout)
 
-			// product routes
-			products := protected.Group("/products")
-			{
-				productRoutes := products
-				productRoutes.POST("/", s.adminMiddleware(), s.createProduct)
-				productRoutes.PUT("/:id", s.adminMiddleware(), s.updateProduct)
-				productRoutes.DELETE("/:id", s.adminMiddleware(), s.deleteProduct)
-				productRoutes.POST("/:id/images", s.adminMiddleware(), s.uploadProductImage)
-			}
-			// cart routes
+	protected := api.Group("/")
+	protected.Use(s.authMiddleware())
 
-			cart := protected.Group("/carts")
-			{
-				cartRoutes := cart
-				cartRoutes.GET("/", s.getCart)
-				cartRoutes.POST("/items", s.addToCart)
-				cartRoutes.PUT("/items/:id", s.updateCart)
-				cartRoutes.DELETE("/items/:id", s.removeFromCart)
-			}
-			// order routes
-			orders := protected.Group("/orders")
-			{
-				orderRoutes := orders
-				orderRoutes.POST("/", s.createOrder)
-				orderRoutes.GET("/", s.getOrders)
-				orderRoutes.GET("/:id", s.getOrder)
-			}
-		}
-		// public routes
-		api.GET("/categories", s.getCategories)
-		api.GET("/search", s.searchProducts)
-		api.GET("/products", s.getProducts)
-		api.GET("/products/:id", s.getProduct)
-	}
+	// User routes
+	users := protected.Group("/users")
+	users.GET("/profile", s.getProfile)
+	users.PUT("/profile", s.updateProfile)
+
+	categories := protected.Group("/categories")
+	categories.POST("/", s.adminMiddleware(), s.createCategory)
+	categories.PUT("/:id", s.adminMiddleware(), s.updateCategory)
+	categories.DELETE("/:id", s.adminMiddleware(), s.deleteCategory)
+
+	// product routes
+	products := protected.Group("/products")
+	products.POST("/", s.adminMiddleware(), s.createProduct)
+	products.PUT("/:id", s.adminMiddleware(), s.updateProduct)
+	products.DELETE("/:id", s.adminMiddleware(), s.deleteProduct)
+	products.POST("/:id/images", s.adminMiddleware(), s.uploadProductImage)
+
+	// cart routes
+	cart := protected.Group("/carts")
+	cart.GET("/", s.getCart)
+	cart.POST("/items", s.addToCart)
+	cart.PUT("/items/:id", s.updateCart)
+	cart.DELETE("/items/:id", s.removeFromCart)
+
+	// order routes
+	orders := protected.Group("/orders")
+	orders.POST("/", s.createOrder)
+	orders.GET("/", s.getOrders)
+	orders.GET("/:id", s.getOrder)
+
+	// public routes
+	api.GET("/categories", s.getCategories)
+	api.GET("/search", s.searchProducts)
+	api.GET("/products", s.getProducts)
+	api.GET("/products/:id", s.getProduct)
 
 	return router
 }

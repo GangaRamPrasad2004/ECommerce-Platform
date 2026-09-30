@@ -10,13 +10,16 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
+
+	//nolint:staticcheck // LocalStack compatibility requires the legacy uploader API in this project.
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
 // S3Provider stores uploaded files in an Amazon S3-compatible service.
 type S3Provider struct {
-	client   *s3.Client
+	client *s3.Client
+	//nolint:staticcheck // LocalStack compatibility requires the legacy uploader API in this project.
 	uploader *manager.Uploader
 	bucket   string
 	endpoint string
@@ -43,7 +46,8 @@ func NewS3Provider(cfg *appconfig.Config) *S3Provider {
 		}
 	})
 	return &S3Provider{
-		client:   client,
+		client: client,
+		//nolint:staticcheck // LocalStack compatibility requires the legacy uploader API in this project.
 		uploader: manager.NewUploader(client),
 		bucket:   cfg.AWS.S3Bucket,
 		endpoint: cfg.AWS.S3Endpoint,
@@ -58,7 +62,8 @@ func (p *S3Provider) UploadFile(file *multipart.FileHeader, path string) (string
 	if err != nil {
 		return "", err
 	}
-	defer src.Close()
+	defer func() { _ = src.Close() }()
+	//nolint:staticcheck // LocalStack compatibility requires the legacy uploader API in this project.
 	result, err := p.uploader.Upload(context.TODO(), &s3.PutObjectInput{
 		Bucket: aws.String(p.bucket),
 		Key:    aws.String(path),

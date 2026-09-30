@@ -47,7 +47,7 @@ func (s *Server) login(c *gin.Context) {
 	}
 	response, err := s.authService.Login(&req)
 	if err != nil {
-		utils.UnauthorizedResponse(c, "Loin failed")
+		utils.UnauthorizedResponse(c, "Login failed")
 		return
 	}
 	utils.SuccessResponse(c, "Login Successful", response)
