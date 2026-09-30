@@ -18,16 +18,24 @@ type Server struct {
 	config         *config.Config //nolint:gofmt // Field alignment is intentional for readability and existing config shape.
 	db             *gorm.DB
 	logger         *zerolog.Logger
-	authService    *service.AuthService
-	userService    *service.UserService
-	productService *service.ProductService
-	uploadService  *service.UploadService
-	cartService    *service.CartService
-	orderService   *service.OrderService
+	authService    service.AuthServiceInterface
+	userService    service.UserServiceInterface
+	productService service.ProductServiceInterface
+	uploadService  service.UploadServiceInterface
+	cartService    service.CartServiceInterface
+	orderService   service.OrderServiceInterface
 }
 
 // New creates a Server with its shared configuration, database, logger, and services.
-func New(cfg *config.Config, db *gorm.DB, logger *zerolog.Logger, authService *service.AuthService, userService *service.UserService, productService *service.ProductService, uploadService *service.UploadService, cartService *service.CartService, orderService *service.OrderService) *Server {
+func New(cfg *config.Config,
+	db *gorm.DB,
+	logger *zerolog.Logger,
+	authService service.AuthServiceInterface,
+	userService service.UserServiceInterface,
+	productService service.ProductServiceInterface,
+	uploadService service.UploadServiceInterface,
+	cartService service.CartServiceInterface,
+	orderService service.OrderServiceInterface) *Server {
 	return &Server{
 		config:         cfg,
 		db:             db,

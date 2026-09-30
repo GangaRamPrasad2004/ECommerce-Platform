@@ -10,6 +10,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var _ OrderServiceInterface = (*OrderService)(nil)
+
 // OrderService manages orders created from shopping carts.
 type OrderService struct {
 	db *gorm.DB

@@ -12,19 +12,19 @@ import (
 
 // Resolver holds the services used by the GraphQL resolvers.
 type Resolver struct {
-	authService    *service.AuthService
-	userService    *service.UserService
-	productService *service.ProductService
-	cartService    *service.CartService
-	orderService   *service.OrderService
+	authService    service.AuthServiceInterface
+	userService    service.UserServiceInterface
+	productService service.ProductServiceInterface
+	cartService    service.CartServiceInterface
+	orderService   service.OrderServiceInterface
 }
 
 // NewResolver creates a new GraphQL resolver with all required services.
-func NewResolver(authService *service.AuthService,
-	userService *service.UserService,
-	productService *service.ProductService,
-	cartService *service.CartService,
-	orderService *service.OrderService) *Resolver {
+func NewResolver(authService service.AuthServiceInterface,
+	userService service.UserServiceInterface,
+	productService service.ProductServiceInterface,
+	cartService service.CartServiceInterface,
+	orderService service.OrderServiceInterface) *Resolver {
 
 	return &Resolver{
 		authService:    authService,

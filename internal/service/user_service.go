@@ -6,6 +6,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var _ UserServiceInterface = (*UserService)(nil)
+
 // UserService manages user profile data.
 type UserService struct {
 	db *gorm.DB

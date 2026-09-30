@@ -7,6 +7,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var _ ProductServiceInterface = (*ProductService)(nil)
+
 // ProductService manages product catalog data.
 type ProductService struct {
 	db *gorm.DB

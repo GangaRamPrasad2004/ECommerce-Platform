@@ -13,6 +13,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var _ AuthServiceInterface = (*AuthService)(nil)
+
 // AuthService handles user registration, authentication, and token lifecycle operations.
 type AuthService struct {
 	db             *gorm.DB
