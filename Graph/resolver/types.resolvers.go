@@ -67,7 +67,6 @@ func (r *userResolver) ID(ctx context.Context, obj *dto.UserResponse) (string, e
 	return fmt.Sprintf("%d", obj.ID), nil
 }
 
-
 // Cart returns graph.CartResolver implementation.
 func (r *Resolver) Cart() graph.CartResolver { return &cartResolver{r} }
 
