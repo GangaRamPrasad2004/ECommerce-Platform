@@ -1,4 +1,4 @@
-.PHONY: help run build dev lint format migrate-create migrate-up migrate-down docker-up docker-down docs-generate
+.PHONY: help run build dev lint format migrate-create migrate-up migrate-down docker-up docker-down docs-generate graph-generate
 
 help:
 	@echo "Available commands:"
@@ -24,34 +24,38 @@ build:
     		fi \
     	done
 run:
-	go run ./cmd/api
+	@go run ./cmd/api
 
 dev:
-	go run ./cmd/api
+	@go run ./cmd/api
 
 lint:format
-	golangci-lint run ./...
+	@golangci-lint run ./...
 
 format:
-	gofmt -s -w .
-	goimports -w .
+	@gofmt -s -w .
+	@goimports -w .
 
 
 docs-generate:
-	mkdir -p docs
-	swag init -g cmd/api/main.go -o docs --parseDependency --parseInternal --exclude .git,docs,docker,db
+	@mkdir -p docs
+	@swag init -g cmd/api/main.go -o docs --parseDependency --parseInternal --exclude .git,docs,docker,db
 
 migrate-create:
-	migrate create -ext sql -dir db/migrations -seq $(name)
+	@migrate create -ext sql -dir db/migrations -seq $(name)
 
 migrate-up:
-	migrate -path db/migrations -database "postgresql://postgres:Renuka@b0315@localhost:5432/ecommerce_shop?sslmode=disable" up
+	@migrate -path db/migrations -database "postgresql://postgres:Renuka@b0315@localhost:5432/ecommerce_shop?sslmode=disable" up
 
 migrate-down:
-	migrate -path db/migrations -database "postgresql://postgres:Renuka@b0315@localhost:5432/ecommerce_shop?sslmode=disable" down
+	@migrate -path db/migrations -database "postgresql://postgres:Renuka@b0315@localhost:5432/ecommerce_shop?sslmode=disable" down
 
 docker-up:
-	docker compose -f docker/docker-compose.yml up -d
+	@docker compose -f docker/docker-compose.yml up -d
 
 docker-down:
-	docker compose -f docker/docker-compose.yml down
+	@docker compose -f docker/docker-compose.yml down
+
+graph-generate:
+	@go get github.com/99designs/gqlgen@v0.17.78
+	@go run github.com/99designs/gqlgen generate
