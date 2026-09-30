@@ -11,18 +11,18 @@ import (
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct {
-	authService    service.AuthService
-	userService    service.UserService
-	productService service.ProductService
-	cartService    service.CartService
-	orderService   service.OrderService
+	authService    *service.AuthService
+	userService    *service.UserService
+	productService *service.ProductService
+	cartService    *service.CartService
+	orderService   *service.OrderService
 }
 
-func NewResolver(authService service.AuthService,
-	userService service.UserService,
-	productService service.ProductService,
-	cartService service.CartService,
-	orderService service.OrderService) *Resolver {
+func NewResolver(authService *service.AuthService,
+	userService *service.UserService,
+	productService *service.ProductService,
+	cartService *service.CartService,
+	orderService *service.OrderService) *Resolver {
 
 	return &Resolver{
 		authService:    authService,

@@ -8,10 +8,10 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/GangaRamPrasad2004/ECommerce-Platform//graph/resolver"
 	"github.com/GangaRamPrasad2004/ECommerce-Platform/graph"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/graph/resolver"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/GangaRamPrasad2004/ECommerce-Platform//internal/utils"
 	"github.com/vektah/gqlparser/v2/ast"
 )
 
@@ -20,7 +20,8 @@ func (s *Server) createGraphQLHandler() *handler.Server {
 	rvr := resolver.NewResolver(
 		s.authService,
 		s.userService,
-		s.productService, s.cartService,
+		s.productService,
+		s.cartService,
 		s.orderService,
 	)
 
