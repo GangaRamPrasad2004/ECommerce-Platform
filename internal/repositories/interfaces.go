@@ -1,9 +1,9 @@
 package repositories
 
 import (
-	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/dto"
+	
 	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/models"
-	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/utils"
+	
 )
 
 // UserRepositoryInterface defines persistence operations for users and refresh tokens.
@@ -39,20 +39,28 @@ type CartRepositoryInterface interface {
 
 // ProductRepositoryInterface defines persistence operations for products and categories.
 type ProductRepositoryInterface interface {
-	CreateCategory(req *dto.CreateCategoryRequest) (*dto.CategoryResponse, error)
-	GetCategories() ([]dto.CategoryResponse, error)
-	UpdateCategory(id uint, req *dto.UpdateCategoryRequest) (*dto.CategoryResponse, error)
+	// Category DB Operations
+	CreateCategory(category *models.Category) error
+	GetActiveCategories() ([]models.Category, error)
+	GetCategoryByID(id uint) (*models.Category, error)
+	UpdateCategory(category *models.Category) error
 	DeleteCategory(id uint) error
 
-	CreateProduct(req *dto.CreateProductRequest) (*dto.ProductResponse, error)
-	GetProducts(page, limit int) ([]dto.ProductResponse, *utils.PaginationMeta, error)
-	GetProduct(id uint) (*dto.ProductResponse, error)
-	UpdateProduct(id uint, req *dto.UpdateProductRequest) (*dto.ProductResponse, error)
+	// Product DB Operations
+	CreateProduct(product *models.Product) error
+	GetProducts(offset, limit int) ([]models.Product, int64, error) // Returns items + total count
+	GetProductByID(id uint) (*models.Product, error)
+	UpdateProduct(product *models.Product) error
 	DeleteProduct(id uint) error
 
-	AddProductImage(productID uint, url, altText string) error
-	SearchProducts(req *dto.SearchProductsRequest) ([]dto.ProductSearchResult, *utils.PaginationMeta, error)
+	// Product Image DB Operations
+	CountProductImages(productID uint) (int64, error)
+	CreateProductImage(image *models.ProductImage) error
+
+	// Search DB Operations
+	SearchProducts(query string, categoryID *uint, minPrice, maxPrice *float64, offset, limit int) ([]ProductWithRank, int64, error)
 }
+
 
 // OrderRepositoryInterface defines persistence operations for customer orders.
 type OrderRepositoryInterface interface {

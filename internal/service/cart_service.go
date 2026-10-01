@@ -32,7 +32,7 @@ func (s *CartService) GetCart(userID uint) (*dto.CartResponse, error) {
 
 // AddToCart adds a product quantity to the user's cart.
 func (s *CartService) AddToCart(userID uint, req *dto.AddToCartRequest) (*dto.CartResponse, error) {
-	product, err := s.productRepo.GetProduct(req.ProductID)
+	product, err := s.productRepo.GetProductByID(req.ProductID)
 	if err != nil {
 		return nil, errors.New("product not found")
 	}
@@ -76,7 +76,7 @@ func (s *CartService) UpdateCartItem(userID, itemID uint, req *dto.UpdateCartIte
 	if err != nil {
 		return nil, errors.New("CartItem not found")
 	}
-	product, err := s.productRepo.GetProduct(cartItem.ProductID)
+	product, err := s.productRepo.GetProductByID(cartItem.ProductID)
 	if err != nil {
 		return nil, errors.New("product not found")
 	}
