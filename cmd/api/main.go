@@ -16,6 +16,7 @@ import (
 	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/interfaces"
 	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/logger"
 	providers "github.com/GangaRamPrasad2004/ECommerce-Platform/internal/provider"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/repositories"
 	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/server"
 	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/service"
 
@@ -74,9 +75,23 @@ func main() {
 
 	gin.SetMode(cfg.Server.GinMode)
 
-	authService := service.NewAuthService(db, cfg, eventPublisher)
+	userRepo := repositories.NewUserRepository(db)
+	cartRepo := repositories.NewCartRepository(db)
+
+	authService := service.NewAuthService(
+		cfg,
+		eventPublisher,
+		userRepo,
+		cartRepo)
 	userService := service.NewUserService(db)
-	productService := service.NewProductService(db)
+
+	productRepo := repositories.NewProductRepository(db)
+
+	productService := service.NewProductService(productRepo)
+
+	cartService := service.NewCartService(cartRepo, productRepo)
+	orderRepo := repositories.NewOrderRepository(db)
+	orderService := service.NewOrderService(orderRepo)
 
 	var uploadProvider interfaces.UploadProvider
 	if cfg.Upload.UploadProvider == "s3" {
@@ -85,8 +100,7 @@ func main() {
 		uploadProvider = providers.NewLocalUploadProvider(cfg.Upload.Path)
 	}
 	uploadService := service.NewUploadService(uploadProvider)
-	cartService := service.NewCartService(db)
-	orderService := service.NewOrderService(db)
+
 	srv := server.New(cfg, db, &log, authService, userService, productService, uploadService, cartService, orderService)
 	router := srv.SetupRoutes()
 	httpServer := &http.Server{

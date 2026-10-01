@@ -1,102 +1,32 @@
 package service
 
 import (
-	"errors"
-	"fmt"
-
 	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/dto"
 	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/models"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/repositories"
 	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/utils"
-	"gorm.io/gorm"
 )
 
 var _ OrderServiceInterface = (*OrderService)(nil)
 
 // OrderService manages orders created from shopping carts.
 type OrderService struct {
-	db *gorm.DB
+	orderRepo repositories.OrderRepositoryInterface
 }
 
-// NewOrderService creates the order service type
-func NewOrderService(db *gorm.DB) *OrderService {
-	return &OrderService{db: db}
+// NewOrderService creates an order service backed by a repository.
+func NewOrderService(orderRepo repositories.OrderRepositoryInterface) *OrderService {
+	return &OrderService{orderRepo: orderRepo}
 }
 
 // CreateOrder creates an order from the user's current cart.
 func (s *OrderService) CreateOrder(userID uint) (*dto.OrderResponse, error) {
-	var orderResponse *dto.OrderResponse
-
-	err := s.db.Transaction(func(tx *gorm.DB) error {
-
-		var cart models.Cart
-		if err := tx.Preload("CartItems.Product").Where("user_id = ?", userID).First(&cart).Error; err != nil {
-			return errors.New("cart not found")
-		}
-
-		if len(cart.CartItems) == 0 {
-			return errors.New("cart is empty")
-		}
-
-		// Calculate total and validate stock
-		var totalAmount float64
-		var orderItems []models.OrderItem
-
-		for i := range cart.CartItems {
-			cartItem := &cart.CartItems[i]
-
-			if cartItem.Product.Stock < cartItem.Quantity {
-				return fmt.Errorf("insufficient stock for product: %s", cartItem.Product.Name)
-			}
-
-			itemTotal := float64(cartItem.Quantity) * cartItem.Product.Price
-			totalAmount += itemTotal
-
-			orderItems = append(orderItems, models.OrderItem{
-				ProductID: cartItem.ProductID,
-				Quantity:  cartItem.Quantity,
-				Price:     cartItem.Product.Price,
-			})
-
-			// Update product stock
-			cartItem.Product.Stock -= cartItem.Quantity
-			if err := tx.Save(&cartItem.Product).Error; err != nil {
-				return err
-			}
-		}
-
-		// Create order
-		order := models.Order{
-			UserID:      userID,
-			Status:      models.OrderStatusPending,
-			TotalAmount: totalAmount,
-			OrderItems:  orderItems,
-		}
-
-		if err := tx.Create(&order).Error; err != nil {
-			return err
-		}
-
-		// Clear cart
-		if err := tx.Unscoped().Where("cart_id = ?", cart.ID).Delete(&models.CartItem{}).Error; err != nil {
-			return err
-		}
-
-		response, err := s.getOrderResponse(tx, order.ID)
-		if err != nil {
-			return err
-		}
-
-		orderResponse = response
-
-		return nil // Transaction successful
-	})
-
+	order, err := s.orderRepo.CreateFromCart(userID)
 	if err != nil {
 		return nil, err
 	}
-
-	return orderResponse, nil
-
+	response := s.convertToOrderResponse(order)
+	return &response, nil
 }
 
 // GetOrders returns a paginated list of orders for the specified user.
@@ -114,16 +44,8 @@ func (s *OrderService) GetOrders(userID uint, page, limit int) ([]dto.OrderRespo
 	}
 
 	offset := (page - 1) * limit
-	var orders []models.Order
-	var total int64
-
-	s.db.Model(&models.Order{}).Where("user_id = ?", userID).Count(&total)
-
-	if err := s.db.Preload("OrderItems.Product.Category").
-		Where("user_id = ?", userID).
-		Order("created_at DESC").
-		Offset(offset).Limit(limit).
-		Find(&orders).Error; err != nil {
+	orders, total, err := s.orderRepo.GetByUserID(userID, offset, limit)
+	if err != nil {
 		return nil, nil, err
 	}
 	response := make([]dto.OrderResponse, len(orders))
@@ -145,25 +67,12 @@ func (s *OrderService) GetOrders(userID uint, page, limit int) ([]dto.OrderRespo
 
 // GetOrder returns an order belonging to the specified user.
 func (s *OrderService) GetOrder(userID, orderID uint) (*dto.OrderResponse, error) {
-	var order models.Order
-	if err := s.db.Preload("OrderItems.Product.Category").
-		Where("id = ? AND user_id = ?", orderID, userID).
-		First(&order).Error; err != nil {
+	order, err := s.orderRepo.GetByIDForUser(userID, orderID)
+	if err != nil {
 		return nil, err
 	}
 
-	response := s.convertToOrderResponse(&order)
-
-	return &response, nil
-}
-
-func (s *OrderService) getOrderResponse(tx *gorm.DB, orderID uint) (*dto.OrderResponse, error) {
-	var order models.Order
-	if err := tx.Preload("OrderItems.Product.Category").First(&order, orderID).Error; err != nil {
-		return nil, err
-	}
-
-	response := s.convertToOrderResponse(&order)
+	response := s.convertToOrderResponse(order)
 
 	return &response, nil
 }

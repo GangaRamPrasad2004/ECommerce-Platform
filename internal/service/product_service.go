@@ -3,100 +3,71 @@ package service
 import (
 	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/dto"
 	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/models"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/repositories"
 	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/utils"
-	"gorm.io/gorm"
 )
 
 var _ ProductServiceInterface = (*ProductService)(nil)
 
 // ProductService manages product catalog data.
 type ProductService struct {
-	db *gorm.DB
+	productRepo repositories.ProductRepositoryInterface
 }
 
-// NewProductService creates a ProductService backed by db.
-func NewProductService(db *gorm.DB) *ProductService {
+// NewProductService creates a ProductService backed by a product repository.
+func NewProductService(productRepo repositories.ProductRepositoryInterface) *ProductService {
 	return &ProductService{
-		db: db,
+		productRepo: productRepo,
 	}
 }
 
 // CreateCategory creates a new product category from req.
 func (s *ProductService) CreateCategory(req *dto.CreateCategoryRequest) (*dto.CategoryResponse, error) {
-	categeory := models.Category{
-		Name:        req.Name,
-		Description: req.Description,
-	}
-	if err := s.db.Create(&categeory).Error; err != nil {
+	category := &models.Category{Name: req.Name, Description: req.Description}
+	if err := s.productRepo.CreateCategory(category); err != nil {
 		return nil, err
 	}
-	return &dto.CategoryResponse{
-		ID:          categeory.ID,
-		Name:        categeory.Name,
-		Description: categeory.Description,
-		IsActive:    categeory.IsActive,
-	}, nil
-
+	return categoryToDTO(category), nil
 }
 
 // GetCategories returns all active product categories.
 func (s *ProductService) GetCategories() ([]dto.CategoryResponse, error) {
-	var categories []models.Category
-	if err := s.db.Where("is_active = ?", true).Find(&categories).Error; err != nil {
+	categories, err := s.productRepo.GetActiveCategories()
+	if err != nil {
 		return nil, err
 	}
-
-	response := make([]dto.CategoryResponse, len(categories))
+	responses := make([]dto.CategoryResponse, len(categories))
 	for i := range categories {
-		response[i] = dto.CategoryResponse{
-			ID:          categories[i].ID,
-			Name:        categories[i].Name,
-			Description: categories[i].Description,
-			IsActive:    categories[i].IsActive,
-			CreatedAt:   categories[i].CreatedAt,
-			UpdatedAt:   categories[i].UpdatedAt,
-		}
+		responses[i] = *categoryToDTO(&categories[i])
 	}
-
-	return response, nil
+	return responses, nil
 }
 
 // UpdateCategory updates the category identified by id and returns it.
 func (s *ProductService) UpdateCategory(id uint, req *dto.UpdateCategoryRequest) (*dto.CategoryResponse, error) {
-
-	var category models.Category
-	if err := s.db.First(&category, id).Error; err != nil {
+	category, err := s.productRepo.GetCategoryByID(id)
+	if err != nil {
 		return nil, err
 	}
-
 	category.Name = req.Name
 	category.Description = req.Description
 	if req.IsActive != nil {
 		category.IsActive = *req.IsActive
 	}
-
-	if err := s.db.Save(&category).Error; err != nil {
+	if err := s.productRepo.UpdateCategory(category); err != nil {
 		return nil, err
 	}
-
-	return &dto.CategoryResponse{
-		ID:          category.ID,
-		Name:        category.Name,
-		Description: category.Description,
-		IsActive:    category.IsActive,
-		CreatedAt:   category.CreatedAt,
-		UpdatedAt:   category.UpdatedAt,
-	}, nil
+	return categoryToDTO(category), nil
 }
 
 // DeleteCategory removes the category identified by id.
 func (s *ProductService) DeleteCategory(id uint) error {
-	return s.db.Delete(&models.Category{}, id).Error
+	return s.productRepo.DeleteCategory(id)
 }
 
 // CreateProduct creates a product from req and returns its full details.
 func (s *ProductService) CreateProduct(req *dto.CreateProductRequest) (*dto.ProductResponse, error) {
-	product := models.Product{
+	product := &models.Product{
 		CategoryID:  req.CategoryID,
 		Name:        req.Name,
 		Description: req.Description,
@@ -104,11 +75,9 @@ func (s *ProductService) CreateProduct(req *dto.CreateProductRequest) (*dto.Prod
 		Stock:       req.Stock,
 		SKU:         req.SKU,
 	}
-
-	if err := s.db.Create(&product).Error; err != nil {
+	if err := s.productRepo.CreateProduct(product); err != nil {
 		return nil, err
 	}
-
 	return s.GetProduct(product.ID)
 }
 
@@ -123,52 +92,38 @@ func (s *ProductService) GetProducts(page, limit int) ([]dto.ProductResponse, *u
 	}
 
 	offset := (page - 1) * limit
-	var products []models.Product
-	var total int64
-
-	s.db.Model(&models.Product{}).Where("is_active = ?", true).Count(&total)
-
-	if err := s.db.Preload("Category").Preload("Images").
-		Where("is_active = ?", true).
-		Offset(offset).Limit(limit).
-		Find(&products).Error; err != nil {
+	products, total, err := s.productRepo.GetProducts(offset, limit)
+	if err != nil {
 		return nil, nil, err
 	}
-
-	response := make([]dto.ProductResponse, len(products))
+	responses := make([]dto.ProductResponse, len(products))
 	for i := range products {
-		response[i] = s.convertToProductResponse(&products[i])
+		responses[i] = *productToDTO(&products[i])
 	}
-
-	totalPages := int((total + int64(limit) - 1) / int64(limit))
 	meta := &utils.PaginationMeta{
 		Page:       page,
 		Limit:      limit,
 		Total:      total,
-		TotalPages: totalPages,
+		TotalPages: int((total + int64(limit) - 1) / int64(limit)),
 	}
-
-	return response, meta, nil
+	return responses, meta, nil
 }
 
 // GetProduct retrieves the product identified by id with its category and images.
 func (s *ProductService) GetProduct(id uint) (*dto.ProductResponse, error) {
-	var product models.Product
-	if err := s.db.Preload("Category").Preload("Images").First(&product, id).Error; err != nil {
+	product, err := s.productRepo.GetProductByID(id)
+	if err != nil {
 		return nil, err
 	}
-
-	response := s.convertToProductResponse(&product)
-	return &response, nil
+	return productToDTO(product), nil
 }
 
 // UpdateProduct updates the product identified by id and returns its full details.
 func (s *ProductService) UpdateProduct(id uint, req *dto.UpdateProductRequest) (*dto.ProductResponse, error) {
-	var product models.Product
-	if err := s.db.First(&product, id).Error; err != nil {
+	product, err := s.productRepo.GetProductByID(id)
+	if err != nil {
 		return nil, err
 	}
-
 	product.CategoryID = req.CategoryID
 	product.Name = req.Name
 	product.Description = req.Description
@@ -177,38 +132,34 @@ func (s *ProductService) UpdateProduct(id uint, req *dto.UpdateProductRequest) (
 	if req.IsActive != nil {
 		product.IsActive = *req.IsActive
 	}
-
-	if err := s.db.Save(&product).Error; err != nil {
+	if err := s.productRepo.UpdateProduct(product); err != nil {
 		return nil, err
 	}
-
 	return s.GetProduct(id)
 }
 
 // DeleteProduct removes the product identified by id.
 func (s *ProductService) DeleteProduct(id uint) error {
-	return s.db.Delete(&models.Product{}, id).Error
+	return s.productRepo.DeleteProduct(id)
 }
 
 // AddProductImage associates an image with a product.
 func (s *ProductService) AddProductImage(productID uint, url, altText string) error {
-
-	var count int64
-	s.db.Model(&models.ProductImage{}).Where("product_id = ?", productID).Count(&count)
-
-	image := models.ProductImage{
+	count, err := s.productRepo.CountProductImages(productID)
+	if err != nil {
+		return err
+	}
+	image := &models.ProductImage{
 		ProductID: productID,
 		URL:       url,
 		AltText:   altText,
-		IsPrimary: count == 0, // First image is primary
+		IsPrimary: count == 0,
 	}
-
-	return s.db.Create(&image).Error
+	return s.productRepo.CreateProductImage(image)
 }
 
 // SearchProducts returns products matching the supplied search criteria.
 func (s *ProductService) SearchProducts(req *dto.SearchProductsRequest) ([]dto.ProductSearchResult, *utils.PaginationMeta, error) {
-
 	if req.Page < 1 {
 		req.Page = 1
 	}
@@ -218,67 +169,45 @@ func (s *ProductService) SearchProducts(req *dto.SearchProductsRequest) ([]dto.P
 	}
 
 	offset := (req.Page - 1) * req.Limit
-
-	// build query
-	query := s.db.Model(&models.Product{}).
-		Select("products.*, ts_rank(search_vector, plainto_tsquery('english', ?)) as rank", req.Query).
-		Where("search_vector @@ plainto_tsquery('english', ?)", req.Query).
-		Where("is_active = ?", true)
-
-	if req.CategoryID != nil {
-		query = query.Where("category_id = ?", *req.CategoryID)
-	}
-
-	if req.MinPrice != nil {
-		query = query.Where("price >= ?", *req.MinPrice)
-	}
-
-	if req.MaxPrice != nil {
-		query = query.Where("price <= ?", *req.MaxPrice)
-	}
-
-	// Count total results
-	var total int64
-	query.Count(&total)
-
-	// Execute query with ranking and create product slices
-	type productsWithRank struct {
-		models.Product
-		Rank float32 `gorm:"column:rank"`
-	}
-	var rows []productsWithRank
-	if err := query.
-		Order("rank DESC, created_at DESC"). // order by relevance
-		Preload("Category").
-		Preload("Images").
-		Offset(offset).
-		Limit(req.Limit).
-		Find(&rows).Error; err != nil {
+	products, total, err := s.productRepo.SearchProducts(
+		req.Query,
+		req.CategoryID,
+		req.MinPrice,
+		req.MaxPrice,
+		offset,
+		req.Limit,
+	)
+	if err != nil {
 		return nil, nil, err
 	}
-
-	// Build output response
-	results := make([]dto.ProductSearchResult, len(rows))
-	for i := range rows {
+	results := make([]dto.ProductSearchResult, len(products))
+	for i := range products {
 		results[i] = dto.ProductSearchResult{
-			ProductResponse: s.convertToProductResponse(&rows[i].Product),
-			Rank:            rows[i].Rank,
+			ProductResponse: *productToDTO(&products[i].Product),
+			Rank:            products[i].Rank,
 		}
 	}
-
-	// build pagination meta
-	totalPages := int((total + int64(req.Limit) - 1) / int64(req.Limit))
 	meta := &utils.PaginationMeta{
 		Page:       req.Page,
 		Limit:      req.Limit,
 		Total:      total,
-		TotalPages: totalPages,
+		TotalPages: int((total + int64(req.Limit) - 1) / int64(req.Limit)),
 	}
-
 	return results, meta, nil
 }
 
-func (s *ProductService) convertToProductResponse(product *models.Product) dto.ProductResponse {
+func categoryToDTO(category *models.Category) *dto.CategoryResponse {
+	return &dto.CategoryResponse{
+		ID:          category.ID,
+		Name:        category.Name,
+		Description: category.Description,
+		IsActive:    category.IsActive,
+		CreatedAt:   category.CreatedAt,
+		UpdatedAt:   category.UpdatedAt,
+	}
+}
+
+func productToDTO(product *models.Product) *dto.ProductResponse {
 	images := make([]dto.ProductImageResponse, len(product.Images))
 	for i := range product.Images {
 		images[i] = dto.ProductImageResponse{
@@ -290,7 +219,7 @@ func (s *ProductService) convertToProductResponse(product *models.Product) dto.P
 		}
 	}
 
-	return dto.ProductResponse{
+	return &dto.ProductResponse{
 		ID:          product.ID,
 		CategoryID:  product.CategoryID,
 		Name:        product.Name,
@@ -299,16 +228,9 @@ func (s *ProductService) convertToProductResponse(product *models.Product) dto.P
 		Stock:       product.Stock,
 		SKU:         product.SKU,
 		IsActive:    product.IsActive,
-		Category: dto.CategoryResponse{
-			ID:          product.Category.ID,
-			Name:        product.Category.Name,
-			Description: product.Category.Description,
-			IsActive:    product.Category.IsActive,
-			CreatedAt:   product.Category.CreatedAt,
-			UpdatedAt:   product.Category.UpdatedAt,
-		},
-		Images:    images,
-		CreatedAt: product.CreatedAt,
-		UpdatedAt: product.UpdatedAt,
+		Category:    *categoryToDTO(&product.Category),
+		Images:      images,
+		CreatedAt:   product.CreatedAt,
+		UpdatedAt:   product.UpdatedAt,
 	}
 }
