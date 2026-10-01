@@ -81,12 +81,17 @@ func main() {
 	authService := service.NewAuthService(
 		cfg,
 		eventPublisher,
-	    userRepo,
-		cartRepo,)
+		userRepo,
+		cartRepo)
 	userService := service.NewUserService(db)
-	productService := service.NewProductService(db)
-	cartService := service.NewCartService(db)
-	orderService := service.NewOrderService(db)
+
+	productRepo := repositories.NewProductRepository(db)
+
+	productService := service.NewProductService(productRepo)
+
+	cartService := service.NewCartService(cartRepo, productRepo)
+	orderRepo := repositories.NewOrderRepository(db)
+	orderService := service.NewOrderService(orderRepo)
 
 	var uploadProvider interfaces.UploadProvider
 	if cfg.Upload.UploadProvider == "s3" {

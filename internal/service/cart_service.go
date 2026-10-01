@@ -5,86 +5,86 @@ import (
 
 	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/dto"
 	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/models"
-	"gorm.io/gorm"
+	"github.com/GangaRamPrasad2004/ECommerce-Platform/internal/repositories"
 )
 
 var _ CartServiceInterface = (*CartService)(nil)
 
 // CartService manages shopping carts and their items.
 type CartService struct {
-	db *gorm.DB
+	cartRepo    repositories.CartRepositoryInterface
+	productRepo repositories.ProductRepositoryInterface
 }
 
-// NewCartService creates a cart service backed by db.
-func NewCartService(db *gorm.DB) *CartService {
-	return &CartService{db: db}
+// NewCartService creates a cart service backed by cart and product repositories.
+func NewCartService(cartRepo repositories.CartRepositoryInterface, productRepo repositories.ProductRepositoryInterface) *CartService {
+	return &CartService{cartRepo: cartRepo, productRepo: productRepo}
 }
 
 // GetCart returns the cart belonging to the specified user.
 func (s *CartService) GetCart(userID uint) (*dto.CartResponse, error) {
-	var cart models.Cart
-	err := s.db.Preload("CartItems.Product.Category").
-		Where("user_id=?", userID).First(&cart).Error
+	cart, err := s.cartRepo.GetByUserIDWithItems(userID)
 	if err != nil {
 		return nil, err
 	}
-	return s.convertToCartResponse(&cart), nil
+	return s.convertToCartResponse(cart), nil
 }
 
 // AddToCart adds a product quantity to the user's cart.
 func (s *CartService) AddToCart(userID uint, req *dto.AddToCartRequest) (*dto.CartResponse, error) {
-	var product models.Product
-	if err := s.db.First(&product).Error; err != nil {
+	product, err := s.productRepo.GetProduct(req.ProductID)
+	if err != nil {
 		return nil, errors.New("product not found")
 	}
 	if product.Stock < req.Quantity {
 		return nil, errors.New("stock is less or insufficient")
 	}
-	var cart models.Cart
-	if err := s.db.Where("user_id = ?", userID).First(&cart).Error; err != nil {
-		cart = models.Cart{UserID: userID}
-		if err := s.db.Create(&cart).Error; err != nil {
-			return nil, err
-		}
-		return s.convertToCartResponse(&cart), nil
+
+	cart, err := s.cartRepo.GetOrCreateByUserID(userID)
+	if err != nil {
+		return nil, err
 	}
 
-	var cartItem models.CartItem
-	if err := s.db.Where("cart_id =? AND product_id = ?", cart.ID, product.ID).First(&cartItem).Error; err != nil {
-		cartItem = models.CartItem{
+	cartItem, err := s.cartRepo.GetItemByCartAndProduct(cart.ID, product.ID)
+	if err != nil {
+		return nil, err
+	}
+	if cartItem == nil {
+		item := models.CartItem{
 			ProductID: req.ProductID,
 			CartID:    cart.ID,
 			Quantity:  req.Quantity,
 		}
-		s.db.Create(&cartItem)
+		if err := s.cartRepo.CreateItem(&item); err != nil {
+			return nil, err
+		}
 	} else {
 		cartItem.Quantity += req.Quantity
 		if cartItem.Quantity > product.Stock {
 			return nil, errors.New("insufficient quantity")
 		}
-		s.db.Save(&cartItem)
+		if err := s.cartRepo.UpdateItem(cartItem); err != nil {
+			return nil, err
+		}
 	}
 	return s.GetCart(userID)
-
 }
 
 // UpdateCartItem changes the quantity of an item in the user's cart.
 func (s *CartService) UpdateCartItem(userID, itemID uint, req *dto.UpdateCartItemRequest) (*dto.CartResponse, error) {
-	var cartItem models.CartItem
-	if err := s.db.Joins("JOIN carts ON cart_items.cart_id = carts.id").
-		Where("cart_items.id=? AND carts.user_id =? ", itemID, userID).
-		First(&cartItem).Error; err != nil {
+	cartItem, err := s.cartRepo.GetItemByIDForUser(userID, itemID)
+	if err != nil {
 		return nil, errors.New("CartItem not found")
 	}
-	var product models.Product
-	if err := s.db.First(&product, cartItem.ProductID).Error; err != nil {
+	product, err := s.productRepo.GetProduct(cartItem.ProductID)
+	if err != nil {
 		return nil, errors.New("product not found")
 	}
 	if product.Stock < req.Quantity {
 		return nil, errors.New("stock is less or insufficient")
 	}
 	cartItem.Quantity = req.Quantity
-	if err := s.db.Save(&cartItem).Error; err != nil {
+	if err := s.cartRepo.UpdateItem(cartItem); err != nil {
 		return nil, err
 	}
 	return s.GetCart(userID)
@@ -92,10 +92,7 @@ func (s *CartService) UpdateCartItem(userID, itemID uint, req *dto.UpdateCartIte
 
 // RemoveFromCart removes an item from the user's cart.
 func (s *CartService) RemoveFromCart(userID, itemID uint) error {
-	return s.db.Where("id = ? AND cart_id IN (?)", itemID,
-		s.db.Select("id").Table("carts").
-			Where("user_id = ?", userID)).
-		Delete(&models.CartItem{}).Error
+	return s.cartRepo.DeleteItemForUser(userID, itemID)
 }
 
 func (s *CartService) convertToCartResponse(cart *models.Cart) *dto.CartResponse {
